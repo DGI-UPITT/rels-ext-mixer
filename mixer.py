@@ -32,13 +32,15 @@ except ImportError:
                     print(message)
                     raise ImportError(message)
 
+HOSTURL = "192.168.2.222"
+
 def getPidsForContentModel(contentModel):
     if not (contentModel.startswith("<") or contentModel.endswith(">")):
         contentModel = "<info:fedora/%s>" % contentModel
 
     # start with the query to pull the desired objects
     query_string = "select $object from <#ri> where $object <fedora-model:hasModel> %s" % contentModel
-    url = urllib.urlopen("http://192.168.2.222:8080/fedora/risearch?type=tuples&flush=TRUE&format=Sparql&lang=itql&stream=on&query=" + urllib.quote_plus(query_string))
+    url = urllib.urlopen("http://%s:8080/fedora/risearch?type=tuples&flush=TRUE&format=Sparql&lang=itql&stream=on&query=%s" % (HOSTURL, urllib.quote_plus(query_string)))
 
     # create the xml parser to retrieve the results
     parser = etree.XMLParser(remove_blank_text=True)
@@ -64,7 +66,7 @@ def getMembersOf(parent, contentModel=""):
             contentModel = "<info:fedora/%s>" % contentModel
         query_string = "select $object from <#ri> where $object <fedora-model:hasModel> %s and $object <fedora-rels-ext:isMemberOfCollection> %s" % (contentModel, parent)
 
-    url = urllib.urlopen("http://192.168.2.222:8080/fedora/risearch?type=tuples&flush=TRUE&format=Sparql&lang=itql&stream=on&query=" + urllib.quote_plus(query_string))
+    url = urllib.urlopen("http://%s:8080/fedora/risearch?type=tuples&flush=TRUE&format=Sparql&lang=itql&stream=on&query=%s" % (HOSTURL, urllib.quote_plus(query_string)))
     # create the xml parser to retrieve the results
     parser = etree.XMLParser(remove_blank_text=True)
     xmlFile = etree.parse(url, parser)
