@@ -52,6 +52,31 @@ def getPidsForContentModel(contentModel):
     pids = [p.attrib["uri"] for p in xmlPids]
     return pids
 
+def getMembersOf(parent, contentModel=""):
+    if not (parent.startswith("<") or parent.endswith(">")):
+        parent = "<info:fedora/%s>" % parent
+
+    if contentModel == "":
+        # start with the query to pull the desired objects
+        query_string = "select $object from <#ri> where $object <fedora-rels-ext:isMemberOfCollection> %s" % parent
+    else:
+        if not (contentModel.startswith("<") or contentModel.endswith(">")):
+            contentModel = "<info:fedora/%s>" % contentModel
+        query_string = "select $object from <#ri> where $object <fedora-model:hasModel> %s and $object <fedora-rels-ext:isMemberOfCollection> %s" % (contentModel, parent)
+
+    url = urllib.urlopen("http://192.168.2.222:8080/fedora/risearch?type=tuples&flush=TRUE&format=Sparql&lang=itql&stream=on&query=" + urllib.quote_plus(query_string))
+    # create the xml parser to retrieve the results
+    parser = etree.XMLParser(remove_blank_text=True)
+    xmlFile = etree.parse(url, parser)
+    xmlFileRoot = xmlFile.getroot()
+
+    results = []
+    pids = []
+    ns = { "results" : "http://www.w3.org/2001/sw/DataAccess/rf1/result" }
+    xmlPids = xmlFileRoot.xpath("/results:sparql/results:results/results:result/results:object", namespaces=ns)
+    pids = [p.attrib["uri"] for p in xmlPids]
+    return pids
+
 def editRelsExt(rels_ext, rels_predicate, newvalue):
     # remove this relation
     rels_ext.purgeRelationships(predicate=rels_predicate)
