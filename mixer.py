@@ -164,12 +164,12 @@ def main(argv):
         else:
             parent = None
 
-        print " page: %d // parent: %s ..." % (str(value[0][0]), number, str(parent)),
+        print " page: %d // parent: %s ..." % (number, str(parent)),
 
         editRelsExt(rels_ext, ["fedora-model", "hasModel"], newModel)
         editRelsExt(rels_ext, ["pageNS", "isPageNumber"], str(number))
         if parent:
-            rels_ext.addRelationship(fedora_relationships.rels_predicate('pageNS', 'isPageOf'), [parent, "pid"])
+            editRelsExt(rels_ext, ['pageNS', 'isPageOf'], str(parent))
         commitRelsExt(rels_ext)
         print("Done")
 
