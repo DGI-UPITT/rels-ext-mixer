@@ -101,7 +101,10 @@ def commitRelsExt(rels_ext):
     return True
 
 def main(argv):
-
+    """
+    Note: this script does not correct pageNS:pageProgression.  We will need to detect if its
+    there before we try to fix it since we only have to make a change if it is there
+    """
     fedora = connectToFedora("http://localhost:8080/fedora", "fedoraAdmin", "anotherFed0r@@dmin")
     if not fedora:
         print("Failed to connect to fedora instance")
